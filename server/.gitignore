@@ -45,3 +45,9 @@ Audios/
 node_modules/
 npm-debug.log
 yarn-error.log
+
+# Large ML Models
+server/models/whisper-base/model.bin
+server/models/*/model.bin
+*.bin
+*.onnx

@@ -28,3 +28,9 @@ Files Tree.ipynb
 # IDE
 .vscode/
 .idea/
+
+# Large ML Models
+server/models/whisper-base/model.bin
+server/models/*/model.bin
+*.bin
+*.onnx
