@@ -1,0 +1,52 @@
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0e27 0%, #0d1528 100%);
+}
+
+.history-section {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.history-section h3 {
+  color: #e8eaf0;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  background: #151932;
+  border: 1px solid #2a3555;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.timestamp {
+  color: #8b92b0;
+}
+
+.confidence {
+  color: #4ff79e;
+  font-weight: 600;
+}
+
+.history-text {
+  color: #e8eaf0;
+  margin: 0;
+  line-height: 1.6;
+}

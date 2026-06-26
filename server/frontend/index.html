@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farsi Voice Assistant</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    :root {
+      --primary: #4f8ef7;
+      --secondary: #7c5bf5;
+      --success: #4ff79e;
+      --danger: #f74f4f;
+      --warning: #ffa726;
+      --bg-primary: #0a0e27;
+      --bg-secondary: #151932;
+      --bg-tertiary: #1e2749;
+      --bg-hover: #232d4f;
+      --text-primary: #e8eaf0;
+      --text-secondary: #8b92b0;
+      --border: #2a3555;
+      --shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+    
+    body {
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #0d1528 100%);
+      color: var(--text-primary);
+      font-family: 'Vazirmatn', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 900px;
+      height: 90vh;
+      max-height: 700px;
+      background: var(--bg-secondary);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      padding: 20px 30px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(79, 142, 247, 0.2);
+    }
+    
+    .header-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    
+    .header-status {
+      font-size: 12px;
+      opacity: 0.9;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 30px;
+      gap: 30px;
+      overflow-y: auto;
+    }
+    
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    .chat-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .chat-area::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .chat-area::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+    
+    .message {
+      display: flex;
+      gap: 12px;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .message.user {
+      justify-content: flex-end;
+    }
+    
+    .message-content {
+      max-width: 70%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 15px;
+      line-height: 1.6;
+      word-wrap: break-word;
+    }
+    
+    .message.user .message-content {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 12px rgba(79, 142, 247, 0.2);
+    }
+    
+    .message.assistant .message-content {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    
+    .message-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      text-align: right;
+    }
+    
+    .message.user .message-meta {
+      text-align: right;
+    }
+    
+    .transaction-details {
+      background: rgba(79, 142, 247, 0.1);
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    
+    .transaction-details-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(79, 142, 247, 0.2);
+    }
+    
+    .transaction-details-row:last-child {
+      border-bottom: none;
+    }
+    
+    .transaction-details-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .transaction-details-value {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    .alert-badge {
+      display: inline-block;
+      background: rgba(255, 167, 38, 0.2);
+      color: var(--warning);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-top: 8px;
+      font-weight: 500;
+      border: 1px solid var(--warning);
+    }
+    
+    .input-section {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .language-selector {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .lang-btn {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    
+    .lang-btn:hover {
+      border-color: var(--primary);
+      color: var(--text-primary);
+    }
+    
+    .lang-btn.active {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-color: var(--primary);
+      color: white;
+    }
+    
+    .recording-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .mic-button {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+      background: rgba(79, 142, 247, 0.1);
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    
+    .mic-button:hover {
+      background: rgba(79, 142, 247, 0.2);
+      transform: scale(1.05);
+    }
+    
+    .mic-button.recording {
+      background: linear-gradient(135deg, var(--danger) 0%, #e63946 100%);
+      border-color: var(--danger);
+      color: white;
+      animation: recordingPulse 1.5s infinite;
+    }
+    
+    @keyframes recordingPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(247, 79, 79, 0.4); }
+      50% { box-shadow: 0 0 0 12px rgba(247, 79, 79, 0); }
+    }
+    
+    .recording-info {
+      display: none;
+      flex: 1;
+      padding: 12px;
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    
+    .recording-info.visible {
+      display: block;
+    }
+    
+    .recording-timer {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--danger);
+      font-family: 'Courier New', monospace;
+    }
+    
+    .recording-waveform {
+      height: 40px;
+      margin-top: 8px;
+      border-radius: 8px;
+      background: var(--bg-hover);
+    }
+    
+    .upload-file {
+      display: none;
+    }
+    
+    .file-label {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+    
+    .file-label:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .send-button {
+      padding: 12px 28px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border: none;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.3s;
+      box-shadow: 0 4px 12px rgba(79, 142, 247, 0.3);
+    }
+    
+    .send-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 142, 247, 0.4);
+    }
+    
+    .send-button:active {
+      transform: translateY(0);
+    }
+    
+    .send-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      text-align: center;
+      gap: 16px;
+      padding: 40px 20px;
+    }
+    
+    .empty-state-icon {
+      font-size: 60px;
+      opacity: 0.5;
+    }
+    
+    .loader {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--primary);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    canvas {
+      display: none;
+    }
+    
+    canvas.visible {
+      display: block;
+      width: 100%;
+      height: 40px;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        max-height: 100vh;
+        border-radius: 0;
+      }
+      
+      .main-content {
+        padding: 20px;
+        gap: 20px;
+      }
+      
+      .message-content {
+        max-width: 85%;
+        font-size: 14px;
+      }
+      
+      .header {
+        padding: 16px 20px;
+      }
+      
+      .header-title {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="header">
+    <div class="header-title">Farsi Voice Assistant</div>
+    <div class="header-status">
+      <span class="status-dot"></span>
+      <span>Ready</span>
+    </div>
+  </div>
+  
+  <div class="main-content">
+    
+    <div class="chat-area" id="chatArea">
+      <div class="empty-state">
+        <div class="empty-state-icon">Mic</div>
+        <div>Click the microphone to start recording</div>
+      </div>
+    </div>
+    
+    <div class="input-section">
+      <div class="language-selector">
+        <button class="lang-btn active" data-lang="fa">FA</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="">AUTO</button>
+      </div>
+      
+      <div class="recording-controls">
+        <button class="mic-button" id="micBtn">Mic</button>
+        
+        <div class="recording-info" id="recordingInfo">
+          <div class="recording-timer" id="recordingTimer">00:00</div>
+          <canvas id="waveCanvas"></canvas>
+        </div>
+        
+        <label class="file-label" for="audioFile">Upload</label>
+        <input type="file" id="audioFile" class="upload-file" accept="audio/*">
+      </div>
+      
+      <button class="send-button" id="sendBtn" disabled>Send</button>
+    </div>
+    
+  </div>
+  
+</div>
+
+<script>
+let mediaRecorder = null;
+let audioChunks = [];
+let recordedBlob = null;
+let uploadedFile = null;
+let timerInterval = null;
+let timerSecs = 0;
+let analyser = null;
+let animFrameId = null;
+let selectedLang = "fa";
+let isRecording = false;
+
+const chatArea = document.getElementById("chatArea");
+const micBtn = document.getElementById("micBtn");
+const recordingInfo = document.getElementById("recordingInfo");
+const recordingTimer = document.getElementById("recordingTimer");
+const waveCanvas = document.getElementById("waveCanvas");
+const audioFile = document.getElementById("audioFile");
+const sendBtn = document.getElementById("sendBtn");
+
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedLang = btn.dataset.lang;
+  });
+});
+
+micBtn.addEventListener("click", async () => {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    await startRecording();
+  }
+});
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    setupVisualizer(stream);
+    
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      recordedBlob = new Blob(audioChunks, { type: "audio/webm" });
+      uploadedFile = null;
+      sendBtn.disabled = false;
+    };
+    
+    mediaRecorder.start();
+    isRecording = true;
+    
+    micBtn.classList.add("recording");
+    micBtn.textContent = "Stop";
+    recordingInfo.classList.add("visible");
+    waveCanvas.classList.add("visible");
+    
+    startTimer();
+  } catch (err) {
+    alert("Microphone access denied: " + err.message);
+  }
+}
+
+function stopRecording() {
+  mediaRecorder.stop();
+  mediaRecorder.stream.getTracks().forEach(t => t.stop());
+  stopTimer();
+  cancelAnimationFrame(animFrameId);
+  
+  isRecording = false;
+  micBtn.classList.remove("recording");
+  micBtn.textContent = "Mic";
+  recordingInfo.classList.remove("visible");
+  waveCanvas.classList.remove("visible");
+}
+
+function startTimer() {
+  timerSecs = 0;
+  timerInterval = setInterval(() => {
+    timerSecs++;
+    const m = String(Math.floor(timerSecs / 60)).padStart(2, "0");
+    const s = String(timerSecs % 60).padStart(2, "0");
+    recordingTimer.textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+function setupVisualizer(stream) {
+  const ctx = new AudioContext();
+  analyser = ctx.createAnalyser();
+  analyser.fftSize = 256;
+  ctx.createMediaStreamSource(stream).connect(analyser);
+  drawWave();
+}
+
+function drawWave() {
+  const canvasCtx = waveCanvas.getContext("2d");
+  const data = new Uint8Array(analyser.frequencyBinCount);
+
+  function draw() {
+    animFrameId = requestAnimationFrame(draw);
+    analyser.getByteTimeDomainData(data);
+    
+    canvasCtx.fillStyle = "#232d4f";
+    canvasCtx.fillRect(0, 0, waveCanvas.width, waveCanvas.height);
+    
+    canvasCtx.lineWidth = 2;
+    canvasCtx.strokeStyle = "#4f8ef7";
+    canvasCtx.beginPath();
+    
+    const sliceW = waveCanvas.width / data.length;
+    let x = 0;
+    
+    for (let i = 0; i < data.length; i++) {
+      const v = data[i] / 128.0;
+      const y = (v * waveCanvas.height) / 2;
+      i === 0 ? canvasCtx.moveTo(x, y) : canvasCtx.lineTo(x, y);
+      x += sliceW;
+    }
+    
+    canvasCtx.lineTo(waveCanvas.width, waveCanvas.height / 2);
+    canvasCtx.stroke();
+  }
+  
+  draw();
+}
+
+audioFile.addEventListener("change", () => {
+  const file = audioFile.files[0];
+  if (file) {
+    uploadedFile = file;
+    recordedBlob = null;
+    sendBtn.disabled = false;
+    document.querySelector(".file-label").textContent = "File: " + file.name;
+  }
+});
+
+sendBtn.addEventListener("click", async () => {
+  const audioToSend = uploadedFile || recordedBlob;
+  if (!audioToSend) return;
+  
+  sendBtn.disabled = true;
+  const originalText = sendBtn.textContent;
+  sendBtn.innerHTML = '<span class="loader"></span>';
+  
+  try {
+    const formData = new FormData();
+    formData.append("file", audioToSend, uploadedFile ? uploadedFile.name : "recording.webm");
+    const langParam = selectedLang ? `?language=${selectedLang}` : "";
+    
+    const res = await fetch(`http://localhost:9999/transcribe/file${langParam}`, {
+      method: "POST",
+      body: formData,
+    });
+    
+    if (!res.ok) throw new Error("Server error");
+    
+    const data = await res.json();
+    
+    if (chatArea.querySelector(".empty-state")) {
+      chatArea.innerHTML = "";
+    }
+    
+    const userMsg = createMessage(data.text_processed, "user", data.detected_keywords, data.confidence);
+    chatArea.appendChild(userMsg);
+    chatArea.scrollTop = chatArea.scrollHeight;
+    
+    recordedBlob = null;
+    uploadedFile = null;
+    audioFile.value = "";
+    document.querySelector(".file-label").textContent = "Upload";
+    
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+  
+  sendBtn.disabled = false;
+  sendBtn.textContent = originalText;
+});
+
+function createMessage(text, role, keywords, confidence) {
+  const msgDiv = document.createElement("div");
+  msgDiv.className = `message ${role}`;
+  
+  const contentDiv = document.createElement("div");
+  contentDiv.className = "message-content";
+  contentDiv.textContent = text;
+  
+  if (keywords && typeof keywords === 'object') {
+    const hasCards = keywords.card_numbers && keywords.card_numbers.length > 0;
+    const hasAccounts = keywords.account_numbers && keywords.account_numbers.length > 0;
+    const hasAmounts = keywords.amounts && keywords.amounts.length > 0;
+    
+    if (hasCards || hasAccounts || hasAmounts) {
+      const txDetails = document.createElement("div");
+      txDetails.className = "transaction-details";
+      
+      if (hasCards) {
+        const row = document.createElement("div");
+        row.className = "transaction-details-row";
+        row.innerHTML = `
+          <span class="transaction-details-label">Card:</span>
+          <span class="transaction-details-value">${keywords.card_numbers[0]}</span>
+        `;
+        txDetails.appendChild(row);
+      }
+      
+      if (hasAccounts) {
+        const row = document.createElement("div");
+        row.className = "transaction-details-row";
+        row.innerHTML = `
+          <span class="transaction-details-label">Account:</span>
+          <span class="transaction-details-value">${keywords.account_numbers[0]}</span>
+        `;
+        txDetails.appendChild(row);
+      }
+      
+      if (hasAmounts) {
+        const row = document.createElement("div");
+        row.className = "transaction-details-row";
+        row.innerHTML = `
+          <span class="transaction-details-label">Amount:</span>
+          <span class="transaction-details-value">${keywords.amounts[0]} Toman/Rial</span>
+        `;
+        txDetails.appendChild(row);
+      }
+      
+      if (keywords.fee_threshold) {
+        const row = document.createElement("div");
+        row.className = "transaction-details-row";
+        row.innerHTML = `
+          <span class="transaction-details-label">Fee Alert:</span>
+          <span class="transaction-details-value">Over ${keywords.fee_threshold}</span>
+        `;
+        txDetails.appendChild(row);
+      }
+      
+      contentDiv.appendChild(txDetails);
+    }
+  }
+  
+  const metaDiv = document.createElement("div");
+  metaDiv.className = "message-meta";
+  metaDiv.textContent = new Date().toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit" });
+  
+  msgDiv.appendChild(contentDiv);
+  msgDiv.appendChild(metaDiv);
+  
+  return msgDiv;
+}
+</script>
+
+</body>
+</html>

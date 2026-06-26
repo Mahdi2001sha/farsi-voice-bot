@@ -1,0 +1,31 @@
+COMPLETE FILE STRUCTURE
+=======================
+
+Farsi to Text/
+│
+├── backend/
+│   ├── main.py
+│   ├── number_processor.py
+│   ├── confidence_scorer.py
+│   ├── keyword_extractor.py
+│   ├── audio_validator.py
+│   ├── requirements.txt
+│   └── __init__.py
+│
+├── frontend/
+│   └── index.html
+│
+├── start.bat
+├── README.md
+├── INSTALL.md
+├── QUICK_START.txt
+├── DEPLOY_SERVER.md
+├── FILE_STRUCTURE.txt (this file)
+│
+├── Audios/ (auto-created)
+│   └── (audio files saved here)
+│
+└── transcription_log.csv (auto-created)
+    (logs saved here)
+
+TOTAL: 17 files

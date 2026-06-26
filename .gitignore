@@ -1,0 +1,30 @@
+# Dependencies
+client/node_modules/
+server/backend/__pycache__/
+*.pyc
+
+# Build outputs
+client/build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs and data
+*.log
+transcription_log.csv
+server/Audios/
+server/Audios/**
+
+# Cache
+client/.cache/
+.DS_Store
+
+# Notebooks and temp
+*.ipynb
+Files Tree.ipynb
+
+# IDE
+.vscode/
+.idea/

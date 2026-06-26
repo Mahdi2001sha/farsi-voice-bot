@@ -1,0 +1,33 @@
+QUICK START GUIDE
+================
+
+Location: C:\Active_Projects\Farsi-voice-bot\Farsi to Text\
+
+Step 1: Install Python packages (first time only)
+  cd C:\Active_Projects\Farsi-voice-bot\Farsi to Text
+  pip install -r backend/requirements.txt
+
+Step 2: Run start.bat
+  Double-click: start.bat
+
+Step 3: Browser opens automatically
+  http://localhost:3000
+
+Step 4: Record or upload audio
+  Click microphone or upload file
+
+Step 5: Click "Transcribe to Text"
+  Results appear below
+
+To stop:
+  Close the two terminal windows that opened
+
+For manual start (without start.bat):
+  Terminal 1: cd C:\Active_Projects\Farsi-voice-bot\Farsi to Text\backend
+              python -m uvicorn main:app --port 9999
+  
+  Terminal 2: cd C:\Active_Projects\Farsi-voice-bot\Farsi to Text\frontend
+              python -m http.server 3000
+  
+  Browser: http://localhost:3000
+
